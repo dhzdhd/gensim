@@ -1,9 +1,8 @@
 use bevy::prelude::*;
-use blob::BlobPlugin;
-use camera::CameraPlugin;
+use plugins::blob::BlobPlugin;
+use plugins::camera::CameraPlugin;
 
-mod blob;
-mod camera;
+mod plugins;
 
 #[derive(Resource)]
 struct Settings {
