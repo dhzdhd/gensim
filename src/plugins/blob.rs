@@ -13,7 +13,7 @@ impl Plugin for BlobPlugin {
 struct Blob;
 
 #[derive(Component)]
-struct Speed(f32);
+pub struct Speed(pub f32);
 
 #[derive(Bundle)]
 pub struct BlobBundle {
@@ -21,22 +21,21 @@ pub struct BlobBundle {
     speed: Speed,
 }
 
-fn spawn_blob(
-    mut commands: Commands,
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-) {
-    let blob = BlobBundle {
-        pbr: PbrBundle {
-            mesh: meshes.add(Mesh::from(shape::Cube::new(1.0))),
-            material: materials.add(Color::ALICE_BLUE.into()),
-            transform: Transform::from_xyz(0.0, 0.5, 0.0),
+fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
+    let blob = SceneBundle {
+        scene: assets.load("Green Blob.glb#Scene0"),
+        transform: Transform {
+            translation: Vec3 {
+                x: 0.0,
+                y: 0.0,
+                z: 0.0,
+            },
+            scale: Vec3::splat(0.1),
             ..default()
         },
-        speed: Speed(2.5),
+        ..default()
     };
-
-    commands.spawn((blob, Blob));
+    commands.spawn((blob, Speed(1.5), Blob));
 }
 
 fn move_blob(
