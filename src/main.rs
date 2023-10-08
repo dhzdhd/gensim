@@ -1,16 +1,16 @@
 use bevy::prelude::*;
 use plugins::blob::BlobPlugin;
 use plugins::camera::CameraPlugin;
+use plugins::world::WorldPlugin;
 
 mod plugins;
 
 #[derive(Resource)]
-struct Settings {
-    screen_size: Vec2,
-}
+struct Settings;
 
 fn main() {
     App::new()
-        .add_plugins((DefaultPlugins, CameraPlugin, BlobPlugin))
+        .add_plugins((DefaultPlugins, CameraPlugin, WorldPlugin, BlobPlugin))
+        .insert_resource(Settings)
         .run();
 }

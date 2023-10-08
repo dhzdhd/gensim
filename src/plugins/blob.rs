@@ -4,7 +4,8 @@ pub struct BlobPlugin;
 
 impl Plugin for BlobPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_blob);
+        app.add_systems(Startup, spawn_blob)
+            .add_systems(Update, move_blob);
     }
 }
 
@@ -17,7 +18,6 @@ struct Speed(f32);
 #[derive(Bundle)]
 pub struct BlobBundle {
     pbr: PbrBundle,
-    blob: Blob,
     speed: Speed,
 }
 
@@ -33,9 +33,29 @@ fn spawn_blob(
             transform: Transform::from_xyz(0.0, 0.5, 0.0),
             ..default()
         },
-        blob: Blob,
         speed: Speed(2.5),
     };
 
-    commands.spawn(blob);
+    commands.spawn((blob, Blob));
+}
+
+fn move_blob(
+    mut blobs: Query<(&mut Transform, &Speed), With<Blob>>,
+    input: Res<Input<KeyCode>>,
+    time: Res<Time>,
+) {
+    for (mut transform, speed) in &mut blobs {
+        if input.pressed(KeyCode::W) {
+            transform.translation.z -= speed.0 * time.delta_seconds();
+        }
+        if input.pressed(KeyCode::S) {
+            transform.translation.z += speed.0 * time.delta_seconds();
+        }
+        if input.pressed(KeyCode::D) {
+            transform.translation.x += speed.0 * time.delta_seconds();
+        }
+        if input.pressed(KeyCode::A) {
+            transform.translation.x -= speed.0 * time.delta_seconds();
+        }
+    }
 }
