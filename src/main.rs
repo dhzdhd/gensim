@@ -1,3 +1,4 @@
+use bevy::core_pipeline::experimental::taa::TemporalAntiAliasPlugin;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_third_person_camera::ThirdPersonCameraPlugin;
@@ -15,6 +16,7 @@ fn main() {
     App::new()
         .add_plugins((
             DefaultPlugins,
+            TemporalAntiAliasPlugin,
             ThirdPersonCameraPlugin,
             WorldInspectorPlugin::new(),
             CameraPlugin,

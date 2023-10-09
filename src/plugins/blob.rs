@@ -5,7 +5,7 @@ pub struct BlobPlugin;
 impl Plugin for BlobPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_blob)
-            .add_systems(Update, move_blob);
+            .add_systems(Update, (start_animations, move_blob));
     }
 }
 
@@ -14,6 +14,9 @@ struct Blob;
 
 #[derive(Component)]
 pub struct Speed(pub f32);
+
+#[derive(Resource)]
+struct Animations(Vec<Handle<AnimationClip>>);
 
 #[derive(Bundle)]
 pub struct BlobBundle {
@@ -30,12 +33,28 @@ fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
                 y: 0.0,
                 z: 0.0,
             },
-            scale: Vec3::splat(0.1),
+            scale: Vec3::splat(1.0),
             ..default()
         },
         ..default()
     };
-    commands.spawn((blob, Speed(1.5), Blob));
+
+    let mut animations = Vec::new();
+    for i in 0..9 {
+        animations.push(assets.load(format!("Green Blob.glb#Animation{i}")));
+    }
+
+    commands.insert_resource(Animations(animations));
+    commands.spawn((blob, Speed(5.0), Blob));
+}
+
+fn start_animations(
+    animations: Res<Animations>,
+    mut players: Query<&mut AnimationPlayer, Added<AnimationPlayer>>,
+) {
+    for mut player in &mut players {
+        player.play(animations.0[4].clone_weak()).repeat();
+    }
 }
 
 fn move_blob(

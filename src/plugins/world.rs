@@ -14,7 +14,7 @@ fn spawn_floor(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane::from_size(15.0))),
+        mesh: meshes.add(Mesh::from(shape::Plane::from_size(50.0))),
         material: materials.add(Color::rgb_u8(50, 2, 64).into()),
         ..default()
     };
@@ -25,11 +25,12 @@ fn spawn_floor(
 fn spawn_light(mut commands: Commands) {
     let light = PointLightBundle {
         point_light: PointLight {
-            intensity: 3000.0,
+            intensity: 14000.0,
             shadows_enabled: true,
+            range: 100.0,
             ..default()
         },
-        transform: Transform::from_xyz(0.0, 5.0, 0.0),
+        transform: Transform::from_xyz(0.0, 15.0, 0.0),
         ..default()
     };
 

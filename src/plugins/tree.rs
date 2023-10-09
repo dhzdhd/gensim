@@ -15,12 +15,8 @@ fn spawn_tree(mut commands: Commands, assets: Res<AssetServer>) {
     let tree = SceneBundle {
         scene: assets.load("Tree Blob.glb#Scene0"),
         transform: Transform {
-            translation: Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            },
-            scale: Vec3::splat(0.2),
+            translation: Vec3::ZERO,
+            scale: Vec3::splat(1.2),
             ..default()
         },
         ..default()
