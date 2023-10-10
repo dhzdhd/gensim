@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use super::tree::Tree;
+
 pub struct BlobPlugin;
 
 impl Plugin for BlobPlugin {
@@ -59,21 +61,23 @@ fn start_animations(
 
 fn move_blob(
     mut blobs: Query<(&mut Transform, &Speed), With<Blob>>,
+    mut trees: Query<&Transform, With<Tree>>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {
-    for (mut transform, speed) in &mut blobs {
-        if input.pressed(KeyCode::W) {
-            transform.translation.z -= speed.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::S) {
-            transform.translation.z += speed.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::D) {
-            transform.translation.x += speed.0 * time.delta_seconds();
-        }
-        if input.pressed(KeyCode::A) {
-            transform.translation.x -= speed.0 * time.delta_seconds();
-        }
-    }
+
+    // for (mut transform, speed) in &mut blobs {
+    //     if input.pressed(KeyCode::W) {
+    //         transform.translation.z -= speed.0 * time.delta_seconds();
+    //     }
+    //     if input.pressed(KeyCode::S) {
+    //         transform.translation.z += speed.0 * time.delta_seconds();
+    //     }
+    //     if input.pressed(KeyCode::D) {
+    //         transform.translation.x += speed.0 * time.delta_seconds();
+    //     }
+    //     if input.pressed(KeyCode::A) {
+    //         transform.translation.x -= speed.0 * time.delta_seconds();
+    //     }
+    // }
 }

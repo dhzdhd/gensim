@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use rand_distr::{Distribution, Normal};
 
 pub struct TreePlugin;
 
@@ -9,17 +10,27 @@ impl Plugin for TreePlugin {
 }
 
 #[derive(Component)]
-struct Tree;
+pub struct Tree;
 
 fn spawn_tree(mut commands: Commands, assets: Res<AssetServer>) {
-    let tree = SceneBundle {
-        scene: assets.load("Tree Blob.glb#Scene0"),
-        transform: Transform {
-            translation: Vec3::ZERO,
-            scale: Vec3::splat(1.2),
+    let mut trees: Vec<(SceneBundle, Tree)> = Vec::new();
+    let normal = Normal::new(0.0, 7.0).unwrap();
+
+    for _ in 0..10 {
+        let x = normal.sample(&mut rand::thread_rng());
+        let z = normal.sample(&mut rand::thread_rng());
+
+        let tree = SceneBundle {
+            scene: assets.load("Tree Blob.glb#Scene0"),
+            transform: Transform {
+                translation: Vec3::new(x, 0.0, z),
+                scale: Vec3::splat(1.2),
+                ..default()
+            },
             ..default()
-        },
-        ..default()
-    };
-    commands.spawn((tree, Tree));
+        };
+        trees.push((tree, Tree));
+    }
+
+    commands.spawn_batch(trees);
 }

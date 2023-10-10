@@ -35,8 +35,7 @@ fn spawn_camera(mut commands: Commands) {
             ..default()
         },
         ThirdPersonCamera {
-            mouse_orbit_button_enabled: true,
-            // cursor_lock_active: false,
+            cursor_lock_active: false,
             zoom: Zoom::new(10.0, 30.0),
             ..default()
         },
