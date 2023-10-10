@@ -1,0 +1,47 @@
+name: Release Web
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install rust toolchain
+        uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: stable
+
+      - name: Install Dependencies
+        run: sudo apt-get update; sudo apt-get install pkg-config libx11-dev libasound2-dev libudev-dev
+
+      - name: Install trunk
+        uses: jetli/trunk-action@v0.1.0
+        with:
+          version: latest
+
+      - name: Add wasm target
+        run: |
+          rustup target add wasm32-unknown-unknown
+
+      - name: Build Release
+        run: |
+          trunk build --release --public-url "${GITHUB_REPOSITORY#*/}"
+
+      - name: Optimize Wasm
+        uses: NiklasEi/wasm-opt-action@v2
+        with:
+          file: dist/*.wasm
+        # Trunk cannot import assets from relative paths (see e.g. https://github.com/thedodd/trunk/issues/395)
+        # On sites like itch.io, we don't know on which base path the game gets served, so we need to rewrite all links to be relative
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
+        with:
+          branch: gh-pages
+          folder: dist
