@@ -12,11 +12,7 @@ html {
 }
 
 body {
-    background: repeating-linear-gradient(135deg,
-            black 0,
-            black 2px,
-            white 2px,
-            white 20px);
+    background: black;
     margin: 0;
 }
 
@@ -29,7 +25,9 @@ body {
 }
 
 #bevy {
-    background-color: white;
+    background-color: black;
     width: 1000px;
     height: 800px;
+    border: solid 0.1rem;
+    border-color: gray;
 }

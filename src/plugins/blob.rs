@@ -61,7 +61,7 @@ fn start_animations(
 
 fn move_blob(
     mut blobs: Query<(&mut Transform, &Speed), With<Blob>>,
-    mut trees: Query<&Transform, With<Tree>>,
+    mut trees: Query<&Transform, (With<Tree>, Without<Blob>)>,
     input: Res<Input<KeyCode>>,
     time: Res<Time>,
 ) {

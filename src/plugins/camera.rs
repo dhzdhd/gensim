@@ -1,10 +1,4 @@
-use bevy::{
-    core_pipeline::{
-        contrast_adaptive_sharpening::ContrastAdaptiveSharpeningSettings,
-        experimental::taa::TemporalAntiAliasBundle, fxaa::Fxaa,
-    },
-    prelude::*,
-};
+use bevy::prelude::*;
 use bevy_third_person_camera::{ThirdPersonCamera, Zoom};
 
 use super::blob::Speed;
@@ -13,8 +7,8 @@ pub struct CameraPlugin;
 
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Startup, spawn_camera)
-            .add_systems(Update, update_taa);
+        app.add_systems(Startup, spawn_camera);
+        // .add_systems(Update, update_taa);
     }
 }
 
@@ -30,10 +24,6 @@ fn spawn_camera(mut commands: Commands) {
     commands.spawn((
         camera,
         Speed(2.0),
-        ContrastAdaptiveSharpeningSettings {
-            enabled: true,
-            ..default()
-        },
         ThirdPersonCamera {
             cursor_lock_active: false,
             zoom: Zoom::new(10.0, 30.0),
@@ -42,13 +32,13 @@ fn spawn_camera(mut commands: Commands) {
     ));
 }
 
-fn update_taa(mut camera: Query<Entity, With<Camera>>, mut commands: Commands) {
-    let camera_entity = camera.single_mut();
-    let mut camera = commands.entity(camera_entity);
+// fn update_taa(mut camera: Query<Entity, With<Camera>>, mut commands: Commands) {
+//     let camera_entity = camera.single_mut();
+//     let mut camera = commands.entity(camera_entity);
 
-    camera.remove::<Fxaa>();
-    camera.insert(TemporalAntiAliasBundle::default());
-}
+//     camera.remove::<Fxaa>();
+//     camera.insert(TemporalAntiAliasBundle::default());
+// }
 // fn move_camera(
 //     input: Res<Input<KeyCode>>,
 //     time: Res<Time>,
