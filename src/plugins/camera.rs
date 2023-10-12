@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{core_pipeline::Skybox, prelude::*};
 use bevy_third_person_camera::{ThirdPersonCamera, Zoom};
 
 use super::blob::Speed;
@@ -12,7 +12,9 @@ impl Plugin for CameraPlugin {
     }
 }
 
-fn spawn_camera(mut commands: Commands) {
+fn spawn_camera(mut commands: Commands, assets: Res<AssetServer>) {
+    let skybox_handle = assets.load("textures/sky.png");
+
     let camera = Camera3dBundle {
         camera: Camera {
             hdr: true,
@@ -21,8 +23,10 @@ fn spawn_camera(mut commands: Commands) {
         transform: Transform::from_xyz(0.0, 30.0, 50.0).looking_at(Vec3::ZERO, Vec3::Y),
         ..default()
     };
+
     commands.spawn((
         camera,
+        Skybox(skybox_handle.clone()),
         Speed(2.0),
         ThirdPersonCamera {
             cursor_lock_active: false,

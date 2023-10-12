@@ -31,7 +31,6 @@ fn spawn_tree(mut commands: Commands, assets: Res<AssetServer>) {
                 z = normal.sample(&mut rand::thread_rng());
             }
         }
-        error!("{positions:?}");
         positions.push(Vec2::new(x, z));
 
         let tree = SceneBundle {
