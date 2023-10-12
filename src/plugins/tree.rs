@@ -16,9 +16,23 @@ fn spawn_tree(mut commands: Commands, assets: Res<AssetServer>) {
     let mut trees: Vec<(SceneBundle, Tree)> = Vec::new();
     let normal = Normal::new(0.0, 7.0).unwrap();
 
+    let mut positions = Vec::new();
+
     for _ in 0..10 {
-        let x = normal.sample(&mut rand::thread_rng());
-        let z = normal.sample(&mut rand::thread_rng());
+        let mut x = normal.sample(&mut rand::thread_rng());
+        let mut z = normal.sample(&mut rand::thread_rng());
+
+        if !positions.is_empty() {
+            while positions
+                .iter()
+                .any(|f: &Vec2| f.distance(Vec2::new(x, z)) < 5.0)
+            {
+                x = normal.sample(&mut rand::thread_rng());
+                z = normal.sample(&mut rand::thread_rng());
+            }
+        }
+        error!("{positions:?}");
+        positions.push(Vec2::new(x, z));
 
         let tree = SceneBundle {
             scene: assets.load("Tree Blob.glb#Scene0"),

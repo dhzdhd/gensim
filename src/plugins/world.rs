@@ -14,7 +14,7 @@ fn spawn_floor(
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane::from_size(50.0))),
+        mesh: meshes.add(Mesh::from(shape::Plane::from_size(100.0))),
         material: materials.add(StandardMaterial {
             base_color: Color::rgb_u8(50, 2, 64),
             perceptual_roughness: 0.7,

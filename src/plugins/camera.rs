@@ -26,7 +26,7 @@ fn spawn_camera(mut commands: Commands) {
         Speed(2.0),
         ThirdPersonCamera {
             cursor_lock_active: false,
-            zoom: Zoom::new(10.0, 30.0),
+            zoom: Zoom::new(30.0, 100.0),
             ..default()
         },
     ));
