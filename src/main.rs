@@ -1,6 +1,7 @@
 use bevy::core_pipeline::experimental::taa::TemporalAntiAliasPlugin;
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
+use bevy_rapier3d::prelude::*;
 use bevy_third_person_camera::ThirdPersonCameraPlugin;
 use plugins::blob::BlobPlugin;
 use plugins::camera::CameraPlugin;
@@ -27,6 +28,8 @@ fn main() {
         .add_plugins((
             TemporalAntiAliasPlugin,
             ThirdPersonCameraPlugin,
+            RapierPhysicsPlugin::<NoUserData>::default(),
+            RapierDebugRenderPlugin::default(),
             WorldInspectorPlugin::new(),
             CameraPlugin,
             WorldPlugin,

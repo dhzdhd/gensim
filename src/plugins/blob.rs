@@ -1,6 +1,7 @@
 use bevy::prelude::*;
 
 use super::tree::Tree;
+use bevy_rapier3d::prelude::*;
 
 pub struct BlobPlugin;
 
@@ -30,11 +31,7 @@ fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
     let blob = SceneBundle {
         scene: assets.load("Green Blob.glb#Scene0"),
         transform: Transform {
-            translation: Vec3 {
-                x: 0.0,
-                y: 0.0,
-                z: 0.0,
-            },
+            translation: Vec3::splat(0.0),
             scale: Vec3::splat(1.0),
             ..default()
         },
@@ -46,8 +43,24 @@ fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
         animations.push(assets.load(format!("Green Blob.glb#Animation{i}")));
     }
 
+    let collider = Collider::cuboid(1.0, 1.0, 1.0);
+
     commands.insert_resource(Animations(animations));
-    commands.spawn((blob, Speed(5.0), Blob));
+    commands
+        .spawn((
+            blob,
+            Speed(5.0),
+            Blob,
+            RigidBody::Dynamic,
+            GravityScale(0.0),
+        ))
+        .with_children(|children| {
+            children
+                .spawn(collider)
+                .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.8, 0.0)))
+                .insert(ActiveEvents::COLLISION_EVENTS)
+                .insert(ActiveCollisionTypes::default() | ActiveCollisionTypes::KINEMATIC_STATIC);
+        });
 }
 
 fn start_animations(
@@ -80,3 +93,9 @@ fn move_blob(
         }
     }
 }
+
+// fn orient_blob(mut blobs: Query<&mut Transform, With<Blob>>) {
+//     for mut transform in &mut blobs {
+//         // transform.
+//     }
+// }

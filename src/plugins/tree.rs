@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_rapier3d::prelude::*;
 use rand_distr::{Distribution, Normal};
 
 pub struct TreePlugin;
@@ -45,5 +46,17 @@ fn spawn_tree(mut commands: Commands, assets: Res<AssetServer>) {
         trees.push((tree, Tree));
     }
 
-    commands.spawn_batch(trees);
+    for i in trees {
+        let collider = Collider::cuboid(1.3, 2.0, 1.3);
+        commands
+            .spawn((i, RigidBody::Fixed))
+            .with_children(|builder| {
+                builder
+                    .spawn(collider)
+                    .insert(TransformBundle::from(Transform::from_xyz(0.0, 1.0, 0.0)))
+                    .insert(
+                        ActiveCollisionTypes::default() | ActiveCollisionTypes::KINEMATIC_STATIC,
+                    );
+            });
+    }
 }

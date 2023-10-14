@@ -6,6 +6,7 @@ use bevy::{
     prelude::*,
     render::render_resource::{TextureViewDescriptor, TextureViewDimension},
 };
+use bevy_rapier3d::prelude::*;
 
 pub struct WorldPlugin;
 
@@ -38,7 +39,7 @@ fn spawn_floor(
         ..default()
     };
 
-    commands.spawn(floor);
+    commands.spawn((floor, RigidBody::Fixed));
 }
 
 fn spawn_light(mut commands: Commands) {
