@@ -8,6 +8,8 @@ use bevy::{
 };
 use bevy_rapier3d::prelude::*;
 
+use crate::bundles::{ColliderBundle, RigidBodyBundle};
+
 pub struct WorldPlugin;
 
 impl Plugin for WorldPlugin {
@@ -23,13 +25,15 @@ struct Cubemap {
     image_handle: Handle<Image>,
 }
 
+const PLANE_SIZE: f32 = 100.0;
+
 fn spawn_floor(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let floor = PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Plane::from_size(100.0))),
+        mesh: meshes.add(Mesh::from(shape::Plane::from_size(PLANE_SIZE))),
         material: materials.add(StandardMaterial {
             base_color: Color::rgb_u8(50, 2, 64),
             perceptual_roughness: 0.7,
@@ -39,7 +43,14 @@ fn spawn_floor(
         ..default()
     };
 
-    commands.spawn((floor, RigidBody::Fixed));
+    commands
+        .spawn((floor, RigidBodyBundle::new(RigidBody::Fixed)))
+        .with_children(|builder| {
+            builder.spawn(ColliderBundle::new(
+                Vec3::new(PLANE_SIZE / 2.0, 0.0, PLANE_SIZE / 2.0),
+                Vec3::splat(0.0),
+            ));
+        });
 }
 
 fn spawn_light(mut commands: Commands) {

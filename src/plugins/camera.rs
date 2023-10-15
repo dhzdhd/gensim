@@ -30,7 +30,7 @@ fn spawn_camera(mut commands: Commands, assets: Res<AssetServer>) {
         Speed(2.0),
         ThirdPersonCamera {
             cursor_lock_active: false,
-            zoom: Zoom::new(30.0, 100.0),
+            zoom: Zoom::new(30.0, 200.0),
             ..default()
         },
     ));

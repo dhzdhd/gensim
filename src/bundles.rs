@@ -33,7 +33,7 @@ impl Default for RigidBodyBundle {
     fn default() -> Self {
         Self {
             body: RigidBody::Dynamic,
-            gravity: GravityScale(0.0),
+            gravity: GravityScale(1.0),
         }
     }
 }
