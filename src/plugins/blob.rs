@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::bundles::{ColliderBundle, RigidBodyBundle};
+
 use super::tree::Tree;
 use bevy_rapier3d::prelude::*;
 
@@ -23,7 +25,7 @@ struct Animations(Vec<Handle<AnimationClip>>);
 
 #[derive(Bundle)]
 pub struct BlobBundle {
-    pbr: PbrBundle,
+    scene: SceneBundle,
     speed: Speed,
 }
 
@@ -43,23 +45,14 @@ fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
         animations.push(assets.load(format!("Green Blob.glb#Animation{i}")));
     }
 
-    let collider = Collider::cuboid(1.0, 1.0, 1.0);
-
     commands.insert_resource(Animations(animations));
     commands
-        .spawn((
-            blob,
-            Speed(5.0),
-            Blob,
-            RigidBody::Dynamic,
-            GravityScale(0.0),
-        ))
+        .spawn((blob, Speed(5.0), Blob, RigidBodyBundle::default()))
         .with_children(|children| {
-            children
-                .spawn(collider)
-                .insert(TransformBundle::from(Transform::from_xyz(0.0, 0.8, 0.0)))
-                .insert(ActiveEvents::COLLISION_EVENTS)
-                .insert(ActiveCollisionTypes::default() | ActiveCollisionTypes::KINEMATIC_STATIC);
+            children.spawn(ColliderBundle::new(
+                Vec3::new(1.0, 1.0, 1.0),
+                Vec3::new(0.0, 0.8, 0.0),
+            ));
         });
 }
 

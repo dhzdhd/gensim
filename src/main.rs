@@ -9,6 +9,7 @@ use plugins::tree::TreePlugin;
 use plugins::world::WorldPlugin;
 
 mod plugins;
+mod bundles;
 
 #[derive(Resource)]
 struct Settings;
