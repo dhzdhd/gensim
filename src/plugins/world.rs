@@ -67,6 +67,7 @@ fn spawn_light(mut commands: Commands) {
     let light = DirectionalLightBundle {
         directional_light: DirectionalLight {
             illuminance: 32000.0,
+            shadows_enabled: true,
             ..default()
         },
         transform: Transform::from_xyz(0.0, 30.0, 0.0)

@@ -8,8 +8,9 @@ use plugins::camera::CameraPlugin;
 use plugins::tree::TreePlugin;
 use plugins::world::WorldPlugin;
 
-mod plugins;
 mod bundles;
+mod components;
+mod plugins;
 
 #[derive(Resource)]
 struct Settings;

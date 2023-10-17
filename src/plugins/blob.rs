@@ -2,7 +2,10 @@ use std::ops::Neg;
 
 use bevy::prelude::*;
 
-use crate::bundles::{ColliderBundle, RigidBodyBundle};
+use crate::{
+    bundles::{ColliderBundle, RigidBodyBundle},
+    components::Health,
+};
 
 use super::tree::Tree;
 use bevy_rapier3d::prelude::*;
@@ -17,19 +20,30 @@ impl Plugin for BlobPlugin {
     }
 }
 
-#[derive(Component)]
+#[derive(Component, Default)]
 struct Blob;
 
-#[derive(Component)]
+#[derive(Component, Default)]
+enum BlobType {
+    #[default]
+    Prey,
+    Predator,
+}
+
+#[derive(Component, Default)]
 pub struct Speed(pub f32);
 
 #[derive(Resource)]
 struct Animations(Vec<Handle<AnimationClip>>);
 
-#[derive(Bundle)]
+#[derive(Bundle, Default)]
 pub struct BlobBundle {
     scene: SceneBundle,
     speed: Speed,
+    identity: Blob,
+    rigid_body: RigidBodyBundle,
+    health: Health,
+    blob_type: BlobType,
 }
 
 #[derive(Resource)]
@@ -53,7 +67,11 @@ fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
 
     commands.insert_resource(Animations(animations));
     commands
-        .spawn((blob, Speed(5.0), Blob, RigidBodyBundle::default()))
+        .spawn(BlobBundle {
+            scene: blob,
+            speed: Speed(5.0),
+            ..default()
+        })
         .with_children(|children| {
             children.spawn(ColliderBundle::new(
                 Vec3::new(1.0, 1.0, 1.0),
@@ -75,46 +93,49 @@ fn move_blob(
     mut blobs: Query<(&mut Transform, &Speed), With<Blob>>,
     trees: Query<&Transform, (With<Tree>, Without<Blob>)>,
     time: Res<Time>,
+    mut timer: ResMut<MoveTimer>,
 ) {
-    // if timer.0.tick(time.delta()).just_finished() {
-    //     info!("hello");
-    // }
-    for (mut blob_transform, blob_speed) in blobs.iter_mut() {
-        let nearest_tree = trees
-            .iter()
-            .reduce(|a, b| {
-                if a.translation.distance(blob_transform.translation)
-                    <= b.translation.distance(blob_transform.translation)
-                {
-                    a
-                } else {
-                    b
-                }
-            })
-            .unwrap();
+    if trees.is_empty() {
+        if timer.0.tick(time.delta()).just_finished() {}
+    } else {
+        for (mut blob_transform, blob_speed) in blobs.iter_mut() {
+            let nearest_tree = trees
+                .iter()
+                .reduce(|a, b| {
+                    if a.translation.distance(blob_transform.translation)
+                        <= b.translation.distance(blob_transform.translation)
+                    {
+                        a
+                    } else {
+                        b
+                    }
+                })
+                .unwrap();
 
-        let target_direction = (blob_transform.translation - nearest_tree.translation)
-            .neg()
-            .normalize();
-        let current_direction = blob_transform.rotation * Vec3::new(0.0, 0.0, 1.0);
+            let target_direction = (blob_transform.translation - nearest_tree.translation)
+                .neg()
+                .normalize();
+            let current_direction = blob_transform.rotation * Vec3::new(0.0, 0.0, 1.0);
 
-        blob_transform.rotate(Quat::from_rotation_arc(current_direction, target_direction));
+            blob_transform.rotate(Quat::from_rotation_arc(current_direction, target_direction));
 
-        if nearest_tree
-            .translation
-            .distance_squared(blob_transform.translation)
-            .floor()
-            > 12.0
-        {
-            info!(
-                "{}",
-                nearest_tree
-                    .translation
-                    .distance_squared(blob_transform.translation)
-            );
-            blob_transform.translation += target_direction * blob_speed.0 * time.delta_seconds();
-        } else {
-            blob_transform.translation += Vec3::ZERO;
+            if nearest_tree
+                .translation
+                .distance_squared(blob_transform.translation)
+                .floor()
+                > 12.0
+            {
+                // info!(
+                //     "{}",
+                //     nearest_tree
+                //         .translation
+                //         .distance_squared(blob_transform.translation)
+                // );
+                blob_transform.translation +=
+                    target_direction * blob_speed.0 * time.delta_seconds();
+            } else {
+                blob_transform.translation += Vec3::ZERO;
+            }
         }
     }
 }
