@@ -1,4 +1,4 @@
-name: Release Web
+name: Deploy web
 
 on:
   push:
@@ -9,7 +9,7 @@ permissions:
   contents: write
 
 jobs:
-  build-web:
+  deploy-wasm:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -32,11 +32,11 @@ jobs:
         run: |
           rustup target add wasm32-unknown-unknown
 
-      - name: Build Release
+      - name: Build release
         run: |
           trunk build --release --public-url "${GITHUB_REPOSITORY#*/}"
 
-      - name: Optimize Wasm
+      - name: Optimize WASM
         uses: NiklasEi/wasm-opt-action@v2
         with:
           file: dist/*.wasm

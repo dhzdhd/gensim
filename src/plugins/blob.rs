@@ -83,13 +83,13 @@ fn move_blob(
         let nearest_tree = trees
             .iter()
             .reduce(|a, b| {
-                return if a.translation.distance(blob_transform.translation)
+                if a.translation.distance(blob_transform.translation)
                     <= b.translation.distance(blob_transform.translation)
                 {
                     a
                 } else {
                     b
-                };
+                }
             })
             .unwrap();
 
