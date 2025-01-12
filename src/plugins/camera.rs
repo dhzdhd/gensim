@@ -26,7 +26,10 @@ fn spawn_camera(mut commands: Commands, assets: Res<AssetServer>) {
 
     commands.spawn((
         camera,
-        Skybox(skybox_handle.clone()),
+        Skybox {
+            image: skybox_handle.clone(),
+            brightness: 1000.0,
+        },
         Speed(2.0),
         ThirdPersonCamera {
             cursor_lock_active: false,

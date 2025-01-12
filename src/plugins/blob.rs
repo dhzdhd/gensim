@@ -9,6 +9,7 @@ use crate::{
 
 use super::tree::Tree;
 use bevy_rapier3d::prelude::*;
+use rand_distr::{Beta, Distribution};
 
 pub struct BlobPlugin;
 
@@ -16,7 +17,7 @@ impl Plugin for BlobPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Startup, spawn_blob)
             .add_systems(Update, (start_animations, move_blob))
-            .insert_resource(MoveTimer(Timer::from_seconds(5.0, TimerMode::Repeating)));
+            .insert_resource(HealthTimer(Timer::from_seconds(5.0, TimerMode::Repeating)));
     }
 }
 
@@ -44,40 +45,68 @@ pub struct BlobBundle {
     rigid_body: RigidBodyBundle,
     health: Health,
     blob_type: BlobType,
+    name: Name,
 }
 
 #[derive(Resource)]
-struct MoveTimer(Timer);
+struct HealthTimer(Timer);
+
+const BLOB_AMOUNT: i32 = 5;
 
 fn spawn_blob(mut commands: Commands, assets: Res<AssetServer>) {
-    let blob = SceneBundle {
-        scene: assets.load("Green Blob.glb#Scene0"),
-        transform: Transform {
-            translation: Vec3::new(45.0, 0.0, 45.0),
-            scale: Vec3::splat(1.0),
-            ..default()
-        },
-        ..default()
-    };
-
     let mut animations = Vec::new();
     for i in 0..9 {
         animations.push(assets.load(format!("Green Blob.glb#Animation{i}")));
     }
 
     commands.insert_resource(Animations(animations));
-    commands
-        .spawn(BlobBundle {
-            scene: blob,
-            speed: Speed(5.0),
+
+    let beta = Beta::new(0.1, 0.1).unwrap();
+    let positions: Vec<Vec3> = Vec::new();
+
+    for i in 0..BLOB_AMOUNT {
+        let x = beta.sample(&mut rand::thread_rng());
+        let z = beta.sample(&mut rand::thread_rng());
+
+        info!("x: {}, z: {}", x, z);
+
+        let blob = SceneBundle {
+            scene: assets.load(if i % 2 == 0 {
+                "Green Spiky Blob.glb#Scene0"
+            } else {
+                "Green Blob.glb#Scene0"
+            }),
+            transform: Transform {
+                translation: Vec3::new(x * 45.0, 0.0, z * 45.0),
+                scale: if i % 2 == 0 {
+                    Vec3::splat(0.6)
+                } else {
+                    Vec3::splat(1.0)
+                },
+                ..default()
+            },
             ..default()
-        })
-        .with_children(|children| {
-            children.spawn(ColliderBundle::new(
-                Vec3::new(1.0, 1.0, 1.0),
-                Vec3::new(0.0, 0.8, 0.0),
-            ));
-        });
+        };
+
+        commands
+            .spawn(BlobBundle {
+                scene: blob,
+                speed: Speed(5.0),
+                blob_type: if i % 2 == 0 {
+                    BlobType::Predator
+                } else {
+                    BlobType::Prey
+                },
+                name: Name::new(format!("Blob {i}")),
+                ..default()
+            })
+            .with_children(|children| {
+                children.spawn(ColliderBundle::new(
+                    Vec3::new(1.0, 1.0, 1.0),
+                    Vec3::new(0.0, 0.8, 0.0),
+                ));
+            });
+    }
 }
 
 fn start_animations(
@@ -89,14 +118,14 @@ fn start_animations(
     }
 }
 
+fn reduce_health(mut timer: ResMut<HealthTimer>) {}
+
 fn move_blob(
     mut blobs: Query<(&mut Transform, &Speed), With<Blob>>,
     trees: Query<&Transform, (With<Tree>, Without<Blob>)>,
     time: Res<Time>,
-    mut timer: ResMut<MoveTimer>,
 ) {
     if trees.is_empty() {
-        if timer.0.tick(time.delta()).just_finished() {}
     } else {
         for (mut blob_transform, blob_speed) in blobs.iter_mut() {
             let nearest_tree = trees
